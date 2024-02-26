@@ -109,7 +109,7 @@ def main():
         for i in df_agg_numeric_cols_as_list:
             df_to_pct[i] = '{:.1%}'.format
             
-        st.dataframe(df_agg_diff_final.style.applymap(neg_style, props='color:red').applymap(pos_style, props='color:green').format(df_to_pct))
+        st.dataframe(df_agg_diff_final.style.map(neg_style, props='color:red').map(pos_style, props='color:green').format(df_to_pct))
     if add_sidebar == 'Individual Video Metrics':
         videos = tuple(df_agg['Video title'])
         video_select = st.selectbox('Pick a Video', videos)
@@ -129,9 +129,13 @@ def main():
         first_30 = first_30.sort_values('Days published')
         
         fig2 = go.Figure()
-        fig2.add_trace(go.Scatter(x=views_cumulative['Days published'], y=views_cumulative['25th percentile views'], 
-                                  mode='lines', 
-                                  name='25th Percentile', line=dict(color='purple', dash = 'dash')))
+        fig2.add_trace(go.Scatter(x=views_cumulative['Days published'], y=views_cumulative['25th percentile views'], mode='lines', name='25th Percentile', line=dict(color='purple', dash = 'dash')))
+        fig2.add_trace(go.Scatter(x=views_cumulative['Days published'], y=views_cumulative['Median views'], mode='lines', name='50th percentile views', line=dict(color='lightblue', dash = 'dash')))
+        fig2.add_trace(go.Scatter(x=views_cumulative['Days published'], y=views_cumulative['75th percentile views'], mode='lines', name='75th Percentile', line=dict(color='hotpink', dash = 'dash')))
+        
+        fig2.add_trace(go.Scatter(x=first_30['Days published'], y=first_30['Views'].cumsum(), mode='lines', name='Current Video', line=dict(color='firebrick', width=8)))
+        
+        fig2.update_layout(title='View Comparision in first 30 days', xaxis_title='Days Since Published', yaxis_title='Cumulative Views')
         
         st.plotly_chart(fig2)
     
